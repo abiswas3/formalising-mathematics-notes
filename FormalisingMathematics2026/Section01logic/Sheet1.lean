@@ -89,8 +89,15 @@ example (h : P → Q) (hP : P) : Q := by
   -- `hP` says that `P` is true, and `h` says that `P` implies `Q`, so `apply h at hP` will change
   -- `hP` to a proof of `Q`.
   apply h at hP
-  -- now `hP` is a proof of `Q` so that's exactly what we want.
+    -- now `hP` is a proof of `Q` so that's exactly what we want.
   exact hP
+
+-- Note: instead of changing hp: Q
+-- we can also specalise h at hp 
+-- this will change h: to Q (by feeding it P)
+example (h: P-> Q) (hp: P) : Q := by
+  specialize h hp
+  exact h
 
 -- The `apply` tactic always needs a hypothesis of the form `P → Q`. But instead of applying
 -- it to a hypothesis `h : P` (which changes the hypothesis to a proof of `Q`), you can instead
@@ -142,17 +149,30 @@ example : P → P := by
 /-- If we know `P`, and we also know `P → Q`, we can deduce `Q`.
 This is called "Modus Ponens" by logicians. -/
 example : P → (P → Q) → Q := by
-  sorry
+  intro hP hQ -- assume we know P and we also know P->Q
+  apply hQ -- this will change the goal to P 
+  exact hP  -- we have P
+
 
 /-- `→` is transitive. That is, if `P → Q` and `Q → R` are true, then
 so is `P → R`. -/
 example : (P → Q) → (Q → R) → P → R := by
-  sorry
+  intro hpq hqr hp 
+  apply hqr 
+  apply hpq 
+  exact hp
+  
+  
 
 /-- If `h : P → Q → R` with goal `⊢ R` and you `apply h`, you'll get
 two goals! Note that tactics operate on only the first goal. -/
 example : (P → Q → R) → (P → Q) → P → R := by
-  sorry
+  intro hpqr hpq hp
+  apply hpqr
+  exact hp 
+  apply hpq hp  -- this applies and runs exact succintly
+
+
 
 /-
 Here are some harder puzzles. They won't teach you anything new about
@@ -164,21 +184,74 @@ in this section, where you'll learn some more tactics.
 variable (S T : Prop)
 
 example : (P → R) → (S → Q) → (R → T) → (Q → R) → S → T := by
-  sorry
+  intro hpr hsq hrt hqr hs 
+  apply hrt
+  apply hqr 
+  apply hsq
+  exact hs 
+
 
 example : (P → Q) → ((P → Q) → P) → Q := by
-  sorry
+  intro hpq hpqp 
+  apply hpq 
+  apply hpqp 
+  exact hpq 
 
+-- Probably an ugly way of solving it
 example : ((P → Q) → R) → ((Q → R) → P) → ((R → P) → Q) → P := by
-  sorry
+  intro pqr qrp rpq 
+  apply qrp 
+  intro q
+  apply pqr 
+  intro p 
+  apply rpq 
+  intro r 
+  exact p 
+  
+  
+
+  
+
 
 example : ((Q → P) → P) → (Q → R) → (R → P) → P := by
-  sorry
+  intro hqpp qr rp 
+  apply hqpp 
+  intro hq 
+  specialize qr hq 
+  specialize rp qr 
+  exact rp 
+  
 
+-- NOTE: You can intro multiple times 
+-- this is a good example to keep in the notes
 example : (((P → Q) → Q) → Q) → P → Q := by
-  sorry
+  -- Assume we have 
+  intro hpqq hp 
+  -- hpqq : ((P → Q) → Q) → Q
+  --hp : P
 
+  apply hpqq 
+  -- New goal is (P->Q) -> Q
+
+  -- Now we can assume that we have P->Q
+  intro hpq 
+
+  -- Forward resoning we feed hpq a proof of P to make it now a proof of Q
+  specialize hpq hp 
+  assumption 
+
+
+
+-- The solutions use taut which is like simp lemma for logic I assume?
 example :
     (((P → Q → Q) → (P → Q) → Q) → R) →
       ((((P → P) → Q) → P → P → Q) → R) → (((P → P → Q) → (P → P) → Q) → R) → R := by
-  sorry
+  intro h1 h2 h3 
+  apply h2 
+  intro h4 h5 
+  specialize h4 id 
+  intro hp 
+  exact h4 
+
+
+  
