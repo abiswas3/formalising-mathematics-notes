@@ -49,29 +49,121 @@ example : P ∨ Q → (P → R) → (Q → R) → R := by
 
 example : P ∨ Q → (P → R) → (Q → R) → R := by
   rintro (h | h)
-  · sorry
-  · sorry
+  · intro pr qr 
+    apply pr h 
+  · intro pq qr 
+    apply qr h
 
 -- symmetry of `or`
 example : P ∨ Q → Q ∨ P := by
-  sorry
-
+  intro h1 
+  obtain h | h := h1
+  . right 
+    assumption
+  . left 
+    assumption
+  
 -- associativity of `or`
 example : (P ∨ Q) ∨ R ↔ P ∨ Q ∨ R := by
-  sorry
-
+  constructor
+  . intro pq
+    obtain h | h := pq 
+    . obtain h'|h' := h
+      . left 
+        exact h'
+      . right 
+        left 
+        exact h' 
+    . right 
+      right 
+      exact h 
+  . intro h 
+    obtain h' | h' := h 
+    . left 
+      left 
+      assumption
+    . obtain h2 | h2 := h'
+      . left 
+        right 
+        assumption
+      . right 
+        assumption
+    
 example : (P → R) → (Q → S) → P ∨ Q → R ∨ S := by
-  sorry
+  intro pr qs pOq 
+  obtain p | q := pOq 
+  . left 
+    apply pr p 
+  . right 
+    apply qs 
+    assumption
 
 example : (P → Q) → P ∨ R → Q ∨ R := by
-  sorry
+  intro pq pOr 
+  obtain p | r := pOr
+  . left 
+    apply pq p 
+  . right 
+    exact r 
 
 example : (P ↔ R) → (Q ↔ S) → (P ∨ Q ↔ R ∨ S) := by
-  sorry
+  intro pr qs 
+  constructor
+  . intro h -- =>
+    obtain p | q := h 
+    . rw [pr] at p
+      left 
+      assumption
+    . rw [qs] at q 
+      right 
+      assumption
+  . intro h  -- <=
+    obtain r | s := h 
+    . rw [<- pr] at r
+      left 
+      assumption
+    . rw [<- qs] at s 
+      right 
+      assumption
+  
 
 -- de Morgan's laws
 example : ¬(P ∨ Q) ↔ ¬P ∧ ¬Q := by
-  sorry
+  constructor
+  . intro h 
+    change ( P ∨ Q ) -> False at h 
+    constructor
+    . change P -> False 
+      intro p 
+      apply h 
+      left 
+      assumption
+    . change Q -> False
+      intro q 
+      apply h 
+      right 
+      assumption
+  . intro h 
+    change (P ∨ Q) -> False 
+    intro pOrq 
+    rcases h with ⟨ nP, nQ ⟩
+    change P -> False at nP
+    change Q -> False at nQ 
+    obtain p | q := pOrq
+    . apply nP p 
+    . apply nQ q 
 
 example : ¬(P ∧ Q) ↔ ¬P ∨ ¬Q := by
-  sorry
+  constructor
+  · intro h -- h: ¬ (P ∧ Q) and |- ¬ P ∨ Q 
+    by_cases hP : P -- assume P is true 
+    · right
+      intro hQ
+      apply h
+      exact ⟨hP, hQ⟩
+    · left -- assume Not ¬ P 
+      exact hP
+  · rintro (hnP | hnQ) ⟨hP, hQ⟩
+    · contradiction
+    · apply hnQ; exact hQ
+
