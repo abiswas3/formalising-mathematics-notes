@@ -30,18 +30,59 @@ variable (X : Type) -- Everything will be a subset of `X`
   (x y z : X) -- x,y,z are elements of `X` or, more precisely, terms of type `X`
 
 -- x,y,z are elements of `X` or, more precisely, terms of type `X`
-example : x ∉ A → x ∈ A → False := by sorry
+example : x ∉ A → x ∈ A → False := by 
+  intro a 
+  rw [Not] at a 
+  exact a 
 
-example : x ∈ A → x ∉ A → False := by sorry
+example : x ∈ A → x ∉ A → False := by 
+  intro a b 
+  rw [Not] at b 
+  apply b a 
 
-example : A ⊆ B → x ∉ B → x ∉ A := by sorry
+example : A ⊆ B → x ∉ B → x ∉ A := by 
+  intro ab b 
+  rw [Not] at * 
+  rw [subset_def] at ab 
+  intro a 
+  specialize ab x a 
+  apply b ab 
 
 -- Lean couldn't work out what I meant when I wrote `x ∈ ∅` so I had
 -- to give it a hint by telling it the type of `∅`.
-example : x ∉ (∅ : Set X) := by sorry
+example : x ∉ (∅ : Set X) := by 
+  rw [Not] 
+  intro h 
+  cases h 
 
-example : x ∈ Aᶜ ↔ x ∉ A := by sorry
 
-example : (∀ x, x ∈ A) ↔ ¬∃ x, x ∈ Aᶜ := by sorry
 
-example : (∃ x, x ∈ A) ↔ ¬∀ x, x ∈ Aᶜ := by sorry
+example : x ∈ Aᶜ ↔ x ∉ A := by 
+  rfl 
+
+example : (∀ x, x ∈ A) ↔ ¬∃ x, x ∈ Aᶜ := by 
+  constructor
+  . intro a b 
+    rcases b with ⟨ xb, hxb ⟩ 
+    apply hxb 
+    specialize a xb 
+    assumption
+  . intro h x   
+    by_contra ha_not 
+    apply h 
+    use x 
+    exact ha_not
+
+
+example : (∃ x, x ∈ A) ↔ ¬∀ x, x ∈ Aᶜ := by 
+  constructor
+  . intro hx hy 
+    rcases hx with ⟨ a, ha⟩
+    specialize hy a 
+    apply hy ha  
+  . intro h 
+    by_contra h1 
+    apply h 
+    intro x hx 
+    apply h1 
+    use x 
