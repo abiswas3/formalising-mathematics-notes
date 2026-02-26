@@ -37,7 +37,7 @@ namespace Section4sheet4
 
 theorem mem_def (X : Type) (P : X → Prop) (a : X) :
     a ∈ {x : X | P x} ↔ P a := by
-  rfl
+  rfl 
 
 /-
 
@@ -54,7 +54,9 @@ def IsEven (n : ℕ) : Prop :=
 -- but the way I've written it is perhaps easier to follow.
 
 example : 74 ∈ {n : ℕ | IsEven n} := by
-  sorry
+  rw [mem_def] 
+  rw [IsEven] 
+  use 37 
 
 -- Let's develop a theory of even real numbers
 def Real.IsEven (r : ℝ) :=
@@ -62,8 +64,15 @@ def Real.IsEven (r : ℝ) :=
 
 -- Turns out it's not interesting
 example : ∀ x, x ∈ {r : ℝ | Real.IsEven r} := by
-  sorry
+  intro x 
+  rw [mem_def] 
+  rw [Real.IsEven] 
+  use (x/2)
+  ring 
 
 -- likewise, the theory of positive negative real numbers is not interesting
 example : ∀ x, x ∉ {r : ℝ | 0 < r ∧ r < 0} := by
-  sorry
+  intro x h 
+  rcases h with ⟨l, r⟩
+  linarith -- NOTE: interesting case 
+
