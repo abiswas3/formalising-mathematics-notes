@@ -31,13 +31,39 @@ Good luck!
 /-- If `a(n)` tends to `t` then `37 * a(n)` tends to `37 * t`-/
 theorem tendsTo_thirtyseven_mul (a : ℕ → ℝ) (t : ℝ) (h : TendsTo a t) :
     TendsTo (fun n ↦ 37 * a n) (37 * t) := by
-  sorry
+  rw [TendsTo] at * 
+  intro e he 
+  specialize h (e/37) (by linarith)
+  cases' h with B hb 
+  use B 
+  intro n hn 
+  specialize hb n hn 
+  calc
+    |37 * a n - 37 * t| = |37*(a n - t)| := by congr; linarith  
+       _                = 37*|a n - t| := by simp only [abs_mul, Nat.abs_ofNat] 
+       _                < 37*(e/37) :=by linarith
+       _                = e := by linarith 
 
 /-- If `a(n)` tends to `t` and `c` is a positive constant then
 `c * a(n)` tends to `c * t`. -/
 theorem tendsTo_pos_const_mul {a : ℕ → ℝ} {t : ℝ} (h : TendsTo a t) {c : ℝ} (hc : 0 < c) :
-    TendsTo (fun n ↦ c * a n) (c * t) := by
-  sorry
+    TendsTo (fun n ↦ c * a n) (c * t) := by{
+  unfold TendsTo at * 
+  intro e he 
+  have h_pos : e/c > 0 := by refine div_pos he hc   
+  specialize h (e/c) (by exact h_pos)
+  cases' h with B hB
+  use B 
+  intro n hn 
+  specialize hB n hn  
+  dsimp only 
+  calc
+    |c * a n - c * t| = |c*(a n - t)| := by congr; linarith  
+      _               ≤ |c| * |a n - t| := by simp
+      _               <  |c| * (e/c) := by gcongr 
+      _               =  c * (e/c) := by rw [abs_of_pos hc]
+      _               = e := by field
+  }
 
 /-- If `a(n)` tends to `t` and `c` is a negative constant then
 `c * a(n)` tends to `c * t`. -/

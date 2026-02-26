@@ -40,32 +40,46 @@ see if you can start beginning to guess what various lemmas should be called.
 
 -/
 
-example (x : ℝ) : |-x| = |x| := by exact?
+example (x : ℝ) : |-x| = |x| := by exact abs_neg x 
 -- click where it says "try this" to replace
 -- `exact?` with an "exact" proof
 -- Why do the replacement? Because it's quicker!
 
-example (x y : ℝ) : |x - y| = |y - x| := by exact?
+example (x y : ℝ) : |x - y| = |y - x| := by exact abs_sub_comm x y 
 
 
 -- Hmm. What would a theorem saying "the max is
 -- less-or-equal to something iff something else
 -- be called, according to Lean's naming conventions?"
-example (A B C : ℕ) : max A B ≤ C ↔ A ≤ C ∧ B ≤ C := by exact?
+example (A B C : ℕ) : max A B ≤ C ↔ A ≤ C ∧ B ≤ C := by exact Nat.max_le
 
 -- abs of something less than something...
 example (x y : ℝ) : |x| < y ↔ -y < x ∧ x < y := by exact?
 
-example (ε : ℝ) (hε : 0 < ε) : 0 < ε / 2 := by linarith
+example (ε : ℝ) (hε : 0 < ε) : 0 < ε / 2 := by linarith -- this can use local context.
 
 -- or linarith, or guess the name...
-example (a b x y : ℝ) (h1 : a < x) (h2 : b < y) : a + b < x + y := by linarith
+example (a b x y : ℝ) (h1 : a < x) (h2 : b < y) : a + b < x + y := by exact add_lt_add h1 h2   
 
-example (ε : ℝ) (hε : 0 < ε) : 0 < ε / 3 := by linarith
+example (ε : ℝ) (hε : 0 < ε) : 0 < ε / 3 := by positivity
 
--- This is too obscure for the library
-example (a b c d x y : ℝ) (h1 : a + c < x) (h2 : b + d < y) : a + b + c + d < x + y := by
-  linarith
+-- but if i made this therem then i can use it right?
+theorem my_theorem (a b c d : ℝ) : a + b + c + d = (a + c) + (b +d) := by 
+  rw [add_assoc  a b c]
+  rw [add_comm b c]
+  rw [add_assoc a]
+  rw [add_assoc c]
+  rw [<- add_assoc a]
+
 
 -- note that add_lt_add doesn't work because
 -- ((a+b)+c)+d and (a+c)+(b+d) are not definitionally equal
+
+
+-- This is too obscure for the library
+example (a b c d x y : ℝ) (h1 : a + c < x) (h2 : b + d < y) : a + b + c + d < x + y := by
+  -- linarith
+  rw [my_theorem a b c d]
+  exact add_lt_add h1 h2 
+
+

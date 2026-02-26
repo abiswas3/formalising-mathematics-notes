@@ -31,10 +31,11 @@ read more about function types in the "three kinds of types" section
 of Part 1 of the course book.
 
 Sometimes you might find yourself with a lambda-defined function
-evaluated at a number. For example, you might see something like
+evaluated at a number. 
+For example, you might see something like
 `(fun n => n^2 + 3) 37`, which means "take the function sending
-`n` to `n^2+3` and then evaluate it at 37". You can use the `dsimp`
-(or `dsimp only`) tactic to simplify this to `37^2+3`.
+`n` to `n^2+3` and then evaluate it at 37". 
+You can use the `dsimp` (or `dsimp only`) tactic to simplify this to `37^2+3`.
 
 The reason we need to know about function notation for this sheet
 is that a sequence `x₀, x₁, x₂, …` of reals on this sheet will
@@ -79,7 +80,7 @@ theorem tendsTo_thirtyseven : TendsTo (fun _ ↦ 37) 37 := by
   rw [tendsTo_def]
   -- introduce ε and the fact that it's positive using `intro`
   intro ε hε
-  use 100
+  use 1 -- can use any number as the sequence is constant
   intro n hn
   norm_num
   exact hε
@@ -87,12 +88,13 @@ theorem tendsTo_thirtyseven : TendsTo (fun _ ↦ 37) 37 := by
 /-- The limit of the constant sequence with value `c` is `c`. -/
 theorem tendsTo_const {c : ℝ} : TendsTo (fun _ ↦ c) c := by
   intro ε hε
-  dsimp only
-  use 37
+  dsimp only -- what does dsimp only do?
+  use 37 -- again can use any number 
   intro n hn
   simp
   exact hε
 
+-- how to use a theorem exactly 
 theorem tendsTo_thirtyseven' : TendsTo (fun _ ↦ 37) 37 := by
   exact tendsTo_const
 
@@ -107,14 +109,27 @@ theorem tendsTo_add_const {a : ℕ → ℝ} {t : ℝ} (c : ℝ) (h : TendsTo a t
   -- of the course notes.  rw [tendsTo_def] at h ⊢
   intro ε hε
   rw [tendsTo_def] at h
+  -- this is saying use this epsilon as the forall epsilon, 
+  -- and it's valid because he: ε > 0
   specialize h ε hε
+  dsimp only 
   ring_nf
   exact h
 
 -- you're not quite ready for this one yet though.
 /-- If `a(n)` tends to `t` then `-a(n)` tends to `-t`.  -/
+-- NOTE: The solutuons use something called peel which i do not yet know. 
 example {a : ℕ → ℝ} {t : ℝ} (ha : TendsTo a t) : TendsTo (fun n => -a n) (-t) := by
-  sorry
+  unfold TendsTo at ha 
+  rw [TendsTo] -- at goal 
+  intro ε hε 
+  specialize ha ε hε 
+  have h' : ∀ n : ℕ, -a n - -t = -(a n - t) := by intro n; ring
+  have h'' : ∀ n : ℕ, |-(a n - t)| = |a n - t| := by intro n; exact abs_neg _
+  simp_rw [h']
+  simp_rw [h'']
+  exact ha 
+
 -- Try this one. You don't know enough material to do it yet!
 -- Where do you get stuck? The problem is that I didn't teach you
 -- any "API" for (a.k.a. theorems about) the absolute value function |.|.

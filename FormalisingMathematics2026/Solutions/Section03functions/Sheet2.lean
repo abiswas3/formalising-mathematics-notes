@@ -51,10 +51,10 @@ variable (X Y Z : Type)
 -- Let's prove some theorems, each of which are true by definition.
 theorem injective_def (f : X → Y) : Injective f ↔ ∀ a b : X, f a = f b → a = b := by
   rfl
-
 -- this proof works, because `injective f`
 -- means ∀ a b, f a = f b → a = b *by definition*
 -- so the proof is "it's reflexivity of `↔`"
+
 -- similarly this is the *definition* of `surjective f`
 theorem surjective_def (f : X → Y) : Surjective f ↔ ∀ b : Y, ∃ a : X, f a = b := by
   rfl
@@ -86,6 +86,16 @@ example : Surjective (id : X → X) := by
   use x
   -- goal is definitionally `x = x`
   rfl
+
+-- My verson 
+example (f : X → Y) (g : Y → Z) (hf : Injective f) (hg : Injective g) : Injective (g ∘ f) := by{
+  rw [Injective] at *
+  intro a₁ a₂ h  
+  rw [comp_eval] at * 
+  specialize hg h 
+  specialize hf hg 
+  exact hf 
+}
 
 -- Theorem: if f : X → Y and g : Y → Z are injective,
 -- then so is g ∘ f
@@ -135,9 +145,8 @@ example (f : X → Y) (g : Y → Z) (hf : Surjective f) (hg : Surjective g) : Su
 -- This is a question on the IUM (Imperial introduction to proof course) function problem sheet
 example (f : X → Y) (g : Y → Z) : Injective (g ∘ f) → Injective f := by
   -- assume gf is injective
-  intro hgf
+  intro hgf x₁ x₂ h  
   -- say x₁, x₂ in X and assume f(x₁)=f(x₂). We want to prove x₁ = x₂
-  intro x₁ x₂ h
   -- by injectivity of gf it suffices to prove g(f(x₁))=g(f(x₂))
   apply hgf
   -- goal is annoyingly `(g ∘ f) x₁ = ...` instead of `g (f x₁) = ...`

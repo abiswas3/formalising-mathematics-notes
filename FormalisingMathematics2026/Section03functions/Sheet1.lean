@@ -145,6 +145,7 @@ theorem my_proof : MySuperEasyProposition := rfl
 --    or "is a proof of 2 = 2"
 
 -- But just proof terms get ugly...
+-- TODO: 
 example (a b : ℕ) : a + a * b = (b + 1) * a :=
   (add_comm a (a * b)).trans ((mul_add_one a b).symm.trans (mul_comm a (b + 1)))
 
@@ -195,7 +196,7 @@ theorem myFactorial_pos (n : ℕ) : 0 < myFactorial n := by
   induction n
   case zero =>
     rw [myFactorial_zero]
-    simp
+    norm_num 
   case succ n ih =>
     rw [myFactorial_add_one]
     positivity -- this tactic tries to prove things of the form ≠ 0, ≥ 0 or > 0
@@ -260,10 +261,10 @@ example (a b c : ℝ) : a * b * c = b * c * a := by
 /- Try doing the first of these without providing any arguments at all,
    and the second with only one argument. -/
 example (a b c : ℝ) : a * (b * c) = b * (c * a) := by
-  sorry
+  rw [mul_comm a, mul_assoc b, mul_comm c]
 
 example (a b c : ℝ) : a * (b * c) = b * (a * c) := by
-  sorry
+  rw [ <- mul_assoc, mul_comm a, mul_assoc b] 
 
 -- Using facts from the local context.
 example (a b c d e f : ℝ) (h : a * b = c * d) (h' : e = f) : a * (b * e) = c * (d * f) := by
@@ -273,11 +274,11 @@ example (a b c d e f : ℝ) (h : a * b = c * d) (h' : e = f) : a * (b * e) = c *
   rw [mul_assoc]
 
 example (a b c d e f : ℝ) (h : b * c = e * f) : a * b * c * d = a * e * f * d := by
-  sorry
+  rw [mul_assoc a b c, h, <- mul_assoc a e f]
 
 -- The lemma `sub_self` could be helpful
 example (a b c d : ℝ) (hyp : c = b * a - d) (hyp' : d = a * b) : c = 0 := by
-  sorry
+  rw [hyp, hyp', mul_comm b, sub_self (a*b)]
 
 example (a b c d e f : ℝ) (h : a * b = c * d) (h' : e = f) : a * (b * e) = c * (d * f) := by
   rw [h', ← mul_assoc, h, mul_assoc]
@@ -333,11 +334,11 @@ example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b :=
 example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b :=
   calc
     (a + b) * (a + b) = a * a + b * a + (a * b + b * b) := by
-      sorry
+      rw [mul_add, add_mul, add_mul]
     _ = a * a + (b * a + a * b) + b * b := by
-      sorry
+      rw [<- add_assoc (a*a + b*a), add_assoc (a*a)]
     _ = a * a + 2 * (a * b) + b * b := by
-      sorry
+      rw [mul_comm b, two_mul]
 
 end
 
@@ -346,10 +347,19 @@ section
 variable (a b c d : ℝ)
 
 example : (a + b) * (c + d) = a * c + a * d + b * c + b * d := by
-  sorry
+  rw [mul_add, add_mul, 
+      add_mul, add_assoc (a*c),
+      <- add_assoc (b*c), 
+      add_comm (b*c), 
+      <- add_assoc (a*c) (a*d + b*c),
+      <- add_assoc (a*c)]
 
 example : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by
-  sorry
+  rw [add_mul]
+  rw [mul_sub, mul_sub]
+  rw [sub_add, <- sub_add (a*b), mul_comm a b ]
+  rw [sub_self, zero_add, pow_two, pow_two]
+
 
 #check pow_two a
 #check mul_sub a b c
@@ -378,13 +388,16 @@ example : c * b * a = b * (a * c) := by
   ring
 
 example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b := by
-  sorry
+  ring 
 
 example : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by
-  sorry
+ ring  
 
 example (hyp : c = d * a + b) (hyp' : b = a * d) : c = 2 * a * d := by
-  sorry
+ calc c = d * a + b := by rw [hyp]  
+      _ = a*d + b := by rw [mul_comm]
+      _ = a*d + a*d := by rw [hyp']
+      _ = 2*a*d := by rw [<- two_mul (a*d), mul_assoc]
 
 end
 

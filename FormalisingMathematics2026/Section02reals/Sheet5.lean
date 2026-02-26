@@ -43,12 +43,14 @@ theorem tendsTo_add {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : Ten
   -- let ε > 0 be arbitrary
   intro ε hε
   --  There's a bound X such that if n≥X then a(n) is within ε/2 of t
-  specialize ha (ε / 2) (by linarith)
-  cases' ha with X hX
+  specialize ha (ε / 2) (by positivity)
+  rcases ha with ⟨ X, hX⟩ 
+  -- cases' ha with X hX also works 
   --  There's a bound Y such that if n≥Y then b(n) is within ε/2 of u
   obtain ⟨Y, hY⟩ := hb (ε / 2) (by linarith)
+  -- This is just anothe rway to do specialise and races lines 46-57 in one line 
   --  use max(X,Y),
-  use max X Y
+  use max X Y -- try defning with let or have that's fine too
   -- now say n ≥ max(X,Y)
   intro n hn
   rw [max_le_iff] at hn
@@ -64,6 +66,21 @@ tends to `t - u`. -/
 theorem tendsTo_sub {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : TendsTo b u) :
     TendsTo (fun n ↦ a n - b n) (t - u) := by
   -- this one follows without too much trouble from earlier results.
-  sorry
+  rw [tendsTo_def] at *
+  intro ε hε 
+  specialize ha (ε/2) (by positivity)
+  specialize hb (ε/2) (by positivity)
+  obtain ⟨ X, hX⟩ := ha 
+  cases' hb with Y hY 
+  use max X Y 
+  intro n hn 
+  rw [max_le_iff] at hn 
+  specialize hX n hn.1
+  specialize hY n hn.2 
+  calc |a n - b n - (t - u)| = |a n - t  - 
+                                      (b n  - u)| := by congr 1; ring  -- not so sure why congr 
+          _                  ≤  |a n - t| + |b n - u| := by exact abs_sub (a n - t) (b n - u) 
+          _                  < (ε/2) + (ε/2) := by exact add_lt_add hX hY    
+          _                  = ε := by ring 
 
 end Section2sheet5
