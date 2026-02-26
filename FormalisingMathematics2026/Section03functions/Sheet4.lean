@@ -80,10 +80,20 @@ example : ¬∀ A B C : Type, ∀ (φ : A → B) (ψ : B → C), Injective (ψ �
 
 -- Below is another one. Let's make a sublemma first.
 theorem gf_surjective : Surjective (g ∘ f) := by
-  sorry
+  rw [Surjective]
+  intro b 
+  use X.a 
 
--- Another question from IUM
 example : ¬∀ A B C : Type, ∀ (φ : A → B) (ψ : B → C), Surjective (ψ ∘ φ) → Surjective φ := by
-  sorry
+  rw [Not] 
+  intro h 
+  specialize h X Y Z f g 
+  specialize h gf_surjective
+  rw [Surjective] at h 
+  have h1 : f X.a = Y.b := rfl  
+  obtain ⟨ α, hα ⟩ := h Y.c 
+  have h2: α = X.a := by trivial 
+  rw [h2] at hα   -- this is a wrong statement 
+  cases hα 
 
 end Section3sheet1
