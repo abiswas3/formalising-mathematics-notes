@@ -54,18 +54,29 @@ theorem Yb_ne_Yc : Y.b ≠ Y.c := by
 
 -- no cases when they're equal!
 theorem gYb_eq_gYc : g Y.b = g Y.c := by
-  sorry
+  rfl 
 
 open Function
 
 theorem gf_injective : Injective (g ∘ f) := by
-  sorry
+  rw [Injective] 
+  intro x y h 
+  cases x 
+  cases y 
+  rfl 
+
 
 -- This is a question on the IUM (Imperial introduction to proof course) function problem sheet.
 -- Recall that if you have a hypothesis of the form `h : ∀ A, ...`, then `specialize h X`
 -- will specialize `h` to the specific case `A = X`.
 example : ¬∀ A B C : Type, ∀ (φ : A → B) (ψ : B → C), Injective (ψ ∘ φ) → Injective ψ := by
-  sorry
+  intro h --  ∀ (A B C : Type) (φ : A → B) (ψ : B → C), Injective (ψ ∘ φ) → Injective ψ 
+  specialize h X Y Z f g 
+  specialize h gf_injective
+  rw [Injective] at h 
+  have h1: g Y.b = g Y.c := by exact gYb_eq_gYc
+  specialize h h1 
+  cases h 
 
 -- Below is another one. Let's make a sublemma first.
 theorem gf_surjective : Surjective (g ∘ f) := by

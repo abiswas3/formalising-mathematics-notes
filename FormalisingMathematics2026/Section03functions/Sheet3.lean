@@ -91,6 +91,7 @@ example : f a = 37 := by-- true by definition
 -- At some point in this proof there are 9 goals; you can see them
 -- by changing the `;` after `cases y` to a `,`. The <;> means
 -- "apply the next tactic to all the goals produced by the last tactic".
+-- TODO: Review this -- it's an interesting example
 example : Function.Injective f := by
   intro x y h
   cases x <;> cases y -- at this point there are 9 goals, and for each goal either the conclusion

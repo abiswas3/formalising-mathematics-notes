@@ -80,18 +80,85 @@ Let's prove some theorems.
 
 -/
 
-example : A ⊆ A := by sorry
+example : A ⊆ A := by {
+  rw [subset_def]
+  intro x 
+  intro xinA 
+  exact xinA 
+}
 
-example : A ⊆ B → B ⊆ C → A ⊆ C := by sorry
+example : A ⊆ B → B ⊆ C → A ⊆ C := by {
+  intro ab bc 
+  rw [subset_def] at *  
+  intro x xInA 
+  specialize ab x (by exact xInA)
+  specialize bc x (by exact ab)
+  exact bc 
+}
 
-example : A ⊆ A ∪ B := by sorry
+example : A ⊆ A ∪ B := by 
+  rw [subset_def] 
+  intro x hx 
+  rw [mem_union_iff]
+  left 
+  exact hx 
 
-example : A ∩ B ⊆ A := by sorry
 
-example : A ⊆ B → A ⊆ C → A ⊆ B ∩ C := by sorry
 
-example : B ⊆ A → C ⊆ A → B ∪ C ⊆ A := by sorry
 
-example : A ⊆ B → C ⊆ D → A ∪ C ⊆ B ∪ D := by sorry
 
-example : A ⊆ B → C ⊆ D → A ∩ C ⊆ B ∩ D := by sorry
+example : A ∩ B ⊆ A := by
+  rw [subset_def] 
+  intro x hx 
+  rw [mem_inter_iff] at hx 
+  exact hx.left
+
+example : A ⊆ B → A ⊆ C → A ⊆ B ∩ C := by 
+  intro ab ac 
+  rw [subset_def] 
+  intro x hx 
+  rw [subset_def] at * 
+  specialize ab x 
+  specialize ab hx 
+  rw [mem_inter_iff] 
+  specialize ac x 
+  specialize ac hx 
+  constructor <;> assumption
+
+  
+example : B ⊆ A → C ⊆ A → B ∪ C ⊆ A := by 
+  intro bc ab 
+  rw [subset_def] at * 
+  intro x hb 
+  rw [mem_union_iff] at hb 
+  rcases hb with h | h 
+  . specialize bc x h
+    assumption
+  . specialize ab x h 
+    assumption
+
+example : A ⊆ B → C ⊆ D → A ∪ C ⊆ B ∪ D := by 
+intro ab  cd 
+rw [subset_def ]
+intro x hx 
+rw [mem_union_iff] at hx 
+rw [mem_union_iff] -- at goal
+rcases hx with h | h 
+. rw [subset_def] at ab 
+  have h2 : x ∈ B := ab x h  
+  left 
+  exact h2 
+. rw [subset_def] at cd 
+  have h2: x ∈ D := cd x h  
+  right 
+  exact h2 
+
+example : A ⊆ B → C ⊆ D → A ∩ C ⊆ B ∩ D := by 
+ intro ab cd 
+ rw [subset_def] at * 
+ intro x  hx 
+ rw [mem_inter_iff] at hx 
+ constructor
+ . exact ab x hx.left
+ . exact cd x hx.right
+
