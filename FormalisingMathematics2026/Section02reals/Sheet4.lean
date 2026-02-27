@@ -71,10 +71,8 @@ theorem my_theorem (a b c d : ℝ) : a + b + c + d = (a + c) + (b +d) := by
   rw [add_assoc c]
   rw [<- add_assoc a]
 
-
 -- note that add_lt_add doesn't work because
 -- ((a+b)+c)+d and (a+c)+(b+d) are not definitionally equal
-
 
 -- This is too obscure for the library
 example (a b c d x y : ℝ) (h1 : a + c < x) (h2 : b + d < y) : a + b + c + d < x + y := by
