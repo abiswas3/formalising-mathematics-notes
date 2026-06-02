@@ -103,10 +103,6 @@ example : A ⊆ A ∪ B := by
   left 
   exact hx 
 
-
-
-
-
 example : A ∩ B ⊆ A := by
   rw [subset_def] 
   intro x hx 
