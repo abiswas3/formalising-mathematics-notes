@@ -111,10 +111,26 @@ theorem tendsTo_add_const {a : ℕ → ℝ} {t : ℝ} (c : ℝ) (h : TendsTo a t
   ring_nf
   exact h
 
+
+theorem abs_equal (x: ℝ): |(-x)| = |x| := by 
+  norm_num 
+
 -- you're not quite ready for this one yet though.
 /-- If `a(n)` tends to `t` then `-a(n)` tends to `-t`.  -/
 example {a : ℕ → ℝ} {t : ℝ} (ha : TendsTo a t) : TendsTo (fun n => -a n) (-t) := by
-  sorry
+  unfold TendsTo
+  intro eps eps_pos
+  unfold TendsTo at ha 
+  specialize ha eps eps_pos 
+  obtain ⟨B', hB⟩ := ha
+  use B'
+  intro n_0 hnn 
+  have h : -a n_0 - -t = -(a n_0 - t) := by ring
+  rw [h]
+  rw [abs_equal]
+  apply hB 
+  assumption
+
 -- Try this one. You don't know enough material to do it yet!
 -- Where do you get stuck? The problem is that I didn't teach you
 -- any "API" for (a.k.a. theorems about) the absolute value function |.|.
