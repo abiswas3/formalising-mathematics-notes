@@ -36,7 +36,7 @@ example : True → True := by
 
 example : False → True := by
   intro h
-  cases h
+  trivial
 
 example : False → False := by
   intro h

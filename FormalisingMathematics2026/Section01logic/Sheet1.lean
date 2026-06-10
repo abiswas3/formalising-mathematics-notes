@@ -209,10 +209,6 @@ example : ((P → Q) → R) → ((Q → R) → P) → ((R → P) → Q) → P :=
   exact p 
   
   
-
-  
-
-
 example : ((Q → P) → P) → (Q → R) → (R → P) → P := by
   intro hqpp qr rp 
   apply hqpp 
@@ -221,6 +217,13 @@ example : ((Q → P) → P) → (Q → R) → (R → P) → P := by
   specialize rp qr 
   exact rp 
   
+
+example : (((P → Q) → Q) → Q) → P → Q := by
+  intro h hp  
+  apply h 
+  intro hpq 
+  apply hpq 
+  exact hp 
 
 -- NOTE: You can intro multiple times 
 -- this is a good example to keep in the notes
@@ -253,5 +256,13 @@ example :
   intro hp 
   exact h4 
 
+-- Some of my personal notes
+example (X Y : Type) (φ ψ : X → Y) (h : ∀ a, φ a = ψ a) :
+  (a : X) → φ a = ψ a := by 
+  apply h
+
+example (X Y : Type) (φ ψ : X → Y) :
+  (∀ a, φ a = ψ a) = ((a : X) → φ a = ψ a) := by
+  rfl
 
   
