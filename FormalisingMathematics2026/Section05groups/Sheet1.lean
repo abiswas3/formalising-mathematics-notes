@@ -46,20 +46,23 @@ example (g : G) : g⁻¹ * g = 1 :=
 -- with the name of the axiom it found. Note also that you can instead *guess*
 -- the names of the axioms. For example what do you think the proof of `1 * a = a` is called?
 example (a b c : G) : a * b * c = a * (b * c) := by
-  sorry
+  rw [mul_assoc _ _ _]
 
 -- can alternatively be found with `apply?` if you didn't know the answer already
 -- or `rw?`
 -- or `simp?`
 example (a : G) : a * 1 = a := by
-  sorry
+  simp only [mul_eq_left]
+
+example (a : G) : a = a * 1 := by
+  rw [left_eq_mul]
 
 -- Can you guess the last two?
 example (a : G) : 1 * a = a := by
-  sorry
+  simp only [mul_eq_right]
 
 example (a : G) : a * a⁻¹ = 1 := by
-  sorry
+  simp only [mul_inv_cancel]
 
 -- As well as the axioms, Lean has many other standard facts which are true
 -- in all groups. See if you can prove these from the axioms, or find them
@@ -68,14 +71,18 @@ example (a : G) : a * a⁻¹ = 1 := by
 variable (a b c : G)
 
 example : a⁻¹ * (a * b) = b := by
-  sorry
+  exact inv_mul_cancel_left _ _ 
 
 example : a * (a⁻¹ * b) = b := by
-  sorry
+  rw [<- mul_assoc, mul_inv_cancel, mul_eq_right]
 
 example {a b c : G} (h1 : b * a = 1) (h2 : a * c = 1) : b = c := by
   -- hint for this one if you're doing it from first principles: `b * (a * c) = (b * a) * c`
-  sorry
+  calc b  = b * 1 := by rw [left_eq_mul]
+       _  = b * (a *c) := by rw [<- h2]
+       _  = (b * a) * c := by simp only [<- mul_assoc]
+       _  = 1 * c := by rw [h1]
+       _  = c := by simp only [one_mul]
 
 example : a * b = 1 ↔ a⁻¹ = b := by
   sorry

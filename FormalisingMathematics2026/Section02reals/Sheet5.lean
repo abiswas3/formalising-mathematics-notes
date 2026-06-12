@@ -59,11 +59,34 @@ theorem tendsTo_add {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : Ten
   constructor <;>-- `<;>` means "do next tactic to all goals produced by this tactic"
     linarith
 
+
+theorem triangle (a b c d : ℝ): |a - b - (c - d)| <= |a - c| + |b -d| := by 
+  sorry
+
+
 /-- If `a(n)` tends to t and `b(n)` tends to `u` then `a(n) - b(n)`
 tends to `t - u`. -/
 theorem tendsTo_sub {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : TendsTo b u) :
     TendsTo (fun n ↦ a n - b n) (t - u) := by
   -- this one follows without too much trouble from earlier results.
-  sorry
+  intro eps0 heps0 
+  rw [TendsTo] at * 
+  specialize ha (eps0/2) (by linarith)
+  specialize hb (eps0/2) (by linarith)
+  /- obtain ⟨B_1, hb1⟩:= hb -/
+  rcases hb with ⟨B_1, hb1 ⟩
+  obtain ⟨B_2, hb2⟩:= ha
+  use max B_1 B_2 
+  intro n0 hn0 
+  rw [max_le_iff] at hn0
+  specialize hb1 n0 (hn0.1) 
+  specialize hb2 n0 (hn0.2) 
+  change |a n0 - b n0 - (t - u)| < eps0 
+  calc |a n0 - b n0 - (t - u)|
+        ≤ |a n0 - t| + |b n0 - u| := by exact triangle (a n0) (b n0) t u
+      _ < eps0 / 2 + |b n0 - u|   := by gcongr
+      _ < eps0 / 2 + eps0 / 2     := by gcongr
+      _ = eps0                    := by linarith
+
 
 end Section2sheet5
