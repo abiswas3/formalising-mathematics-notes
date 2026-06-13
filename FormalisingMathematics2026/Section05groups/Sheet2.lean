@@ -53,13 +53,27 @@ first.
 
 -/
 
-theorem mul_left_cancel (h : a * b = a * c) : b = c := by sorry
+theorem mul_left_cancel (h : a * b = a * c) : b = c := by 
+  rw [<- one_mul b,  
+      <- inv_mul_cancel a, 
+      mul_assoc a⁻¹ _ _, 
+      h, 
+      <- mul_assoc a⁻¹ _ _, 
+      inv_mul_cancel _, 
+      one_mul ]
+  
 
-theorem mul_eq_of_eq_inv_mul (h : b = a⁻¹ * c) : a * b = c := by sorry
+theorem mul_eq_of_eq_inv_mul (h : b = a⁻¹ * c) : a * b = c := by 
+  apply mul_left_cancel (a⁻¹)
+  rw [<- mul_assoc, inv_mul_cancel, one_mul, h]
 
-theorem mul_one (a : G) : a * 1 = a := by sorry
+theorem mul_one (a : G) : a * 1 = a := by 
+  apply mul_eq_of_eq_inv_mul a 1 a
+  rw [<- inv_mul_cancel]
 
-theorem mul_inv_cancel (a : G) : a * a⁻¹ = 1 := by sorry
+theorem mul_inv_cancel (a : G) : a * a⁻¹ = 1 := by 
+  apply mul_left_cancel a⁻¹
+  rw [<- mul_assoc, inv_mul_cancel, one_mul, mul_one]
 
 /-
 And now we have all the pieces of information, we can put them together in this lemma.
@@ -92,22 +106,31 @@ class BadGroup (G : Type) extends One G, Mul G, Inv G where
 -- Here's the answer!
 -- `Bool` is a type with two terms, `Bool.true` and `Bool.false`. See if you can make it into
 -- a bad group which isn't a group!
-instance : One Bool :=
-  ⟨sorry⟩
+instance : One Bool where
+  one := Bool.true
 
-instance : Mul Bool :=
-  ⟨sorry⟩
 
-instance : Inv Bool :=
-  ⟨sorry⟩
+instance : Mul Bool where
+  mul := (fun x _y => x)
+
+instance : Inv Bool where 
+  inv := (fun _x => Bool.true)
 
 instance : BadGroup Bool where
-  mul_assoc := sorry
-  -- `by decide`, might be able to do this
-  mul_one := sorry
+  -- both sides reduce to `a` (since `*` returns its left argument), so `rfl`.
+  mul_assoc := by intro a b c; rfl
+  -- `by decide` also works here
+  mul_one := by 
+             intro a; rfl 
   -- by decide
-  inv_mul_cancel := sorry
+  inv_mul_cancel := by intro a; rfl
   -- by decide
 
-example : ¬∀ a : Bool, 1 * a = a := by sorry
+example : ¬∀ a : Bool, 1 * a = a := by
+  intro h
+  specialize h Bool.false 
+  have h': 1 * Bool.false = Bool.true := by rfl 
+  rw [h'] at h
+  contradiction
+
 -- by decide
