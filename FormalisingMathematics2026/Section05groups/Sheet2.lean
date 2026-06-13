@@ -65,9 +65,9 @@ theorem mul_inv_cancel (a : G) : a * a⁻¹ = 1 := by sorry
 And now we have all the pieces of information, we can put them together in this lemma.
 -/
 instance : Group G where
-  mul_assoc := mul_assoc
-  one_mul := one_mul
-  mul_one := mul_one
+  mul_assoc := WeakGroup.mul_assoc
+  one_mul := WeakGroup.one_mul
+  mul_one := WeakGroup.mul_one
   inv_mul_cancel := inv_mul_cancel
 
 end WeakGroup
