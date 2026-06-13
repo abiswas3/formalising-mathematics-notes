@@ -85,16 +85,23 @@ example {a b c : G} (h1 : b * a = 1) (h2 : a * c = 1) : b = c := by
        _  = c := by simp only [one_mul]
 
 example : a * b = 1 ↔ a⁻¹ = b := by
-  sorry
+  constructor
+  · intro h
+    rw [<- inv_eq_iff_mul_eq_one] at h 
+    exact h
+  · intro h
+    rw [<- h]
+    rw [mul_inv_cancel a]
+
 
 example : (1 : G)⁻¹ = 1 := by
-  sorry
+  rw [inv_one]
 
 example : a⁻¹⁻¹ = a := by
-  sorry
+  rw [inv_inv]
 
 example : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
-  sorry
+  rw [mul_inv_rev]
 
 /-
 
@@ -113,5 +120,9 @@ educated guessing).
 example : (b⁻¹ * a⁻¹)⁻¹ * 1⁻¹⁻¹ * b⁻¹ * (a⁻¹ * a⁻¹⁻¹⁻¹) * a = 1 := by group
 
 -- Try this trickier problem: if g^2=1 for all g in G, then G is abelian
-example (h : ∀ g : G, g * g = 1) : ∀ g h : G, g * h = h * g := by
-  sorry
+example (h3 : ∀ g : G, g * g = 1) : ∀ g h : G, g * h = h * g := by
+  have h_inv (x: G): x = x⁻¹ := by 
+                      apply eq_inv_of_mul_eq_one_left
+                      apply h3 x 
+  intro g k 
+  rw [h_inv (g*k), mul_inv_rev, <-h_inv (k), <- h_inv (g)]
