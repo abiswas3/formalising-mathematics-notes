@@ -48,22 +48,39 @@ Of course, now we've proved this theorem, you can
 open Set
 
 def IsEven (n : ℕ) : Prop :=
-  ∃ t, n = 2 * t
+  ∃ (t: ℕ), n = 2 * t
 
 -- note that this is *syntactically* equal to `IsEven : ℕ → Prop := fun n ↦ ∃ t, n = 2 * t`
 -- but the way I've written it is perhaps easier to follow.
 
 example : 74 ∈ {n : ℕ | IsEven n} := by
-  sorry
+  change IsEven 74 
+  unfold IsEven 
+  use 37 
+
 
 -- Let's develop a theory of even real numbers
 def Real.IsEven (r : ℝ) :=
   ∃ t : ℝ, r = 2 * t
 
+
 -- Turns out it's not interesting
 example : ∀ x, x ∈ {r : ℝ | Real.IsEven r} := by
-  sorry
+ intro x 
+ change Real.IsEven x 
+ /- change x.IsEven  -/
+ use x /2
+ ring 
 
 -- likewise, the theory of positive negative real numbers is not interesting
 example : ∀ x, x ∉ {r : ℝ | 0 < r ∧ r < 0} := by
-  sorry
+  intro x 
+  by_contra h 
+  change (0 < x) ∧ (x < 0) at h 
+  have h1 : 0 < x := h.left 
+  have h2 : x < 0 := h.right
+  -- linarith
+  apply lt_asymm h1 
+  exact h2
+  
+

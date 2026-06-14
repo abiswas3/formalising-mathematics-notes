@@ -30,18 +30,49 @@ variable (X : Type) -- Everything will be a subset of `X`
   (x y z : X) -- x,y,z are elements of `X` or, more precisely, terms of type `X`
 
 -- x,y,z are elements of `X` or, more precisely, terms of type `X`
-example : x ∉ A → x ∈ A → False := by sorry
+example : x ∉ A → x ∈ A → False := by 
+  intro h h'
+  contradiction
 
-example : x ∈ A → x ∉ A → False := by sorry
+example : x ∈ A → x ∉ A → False := by 
+  intro h h' 
+  contradiction
 
-example : A ⊆ B → x ∉ B → x ∉ A := by sorry
+example : A ⊆ B → x ∉ B → x ∉ A := by 
+  intro hab hx
+  change (x ∈ A) -> False
+  intro ha 
+  specialize hab ha 
+  contradiction
 
 -- Lean couldn't work out what I meant when I wrote `x ∈ ∅` so I had
 -- to give it a hint by telling it the type of `∅`.
-example : x ∉ (∅ : Set X) := by sorry
+example : x ∉ (∅ : Set X) := by 
+  change (x ∈ ∅) -> False
+  intro h 
+  have h: True := by trivial 
+  trivial
 
-example : x ∈ Aᶜ ↔ x ∉ A := by sorry
+example : x ∈ Aᶜ ↔ x ∉ A := by 
+  constructor
+  · intro h 
+    exact h 
+  · intro h 
+    exact h
 
-example : (∀ x, x ∈ A) ↔ ¬∃ x, x ∈ Aᶜ := by sorry
 
-example : (∃ x, x ∈ A) ↔ ¬∀ x, x ∈ Aᶜ := by sorry
+example : (∀ x, x ∈ A) ↔ ¬∃ x, x ∈ Aᶜ := by 
+  constructor
+  · intro h1 h2 
+    rcases h2 with ⟨z, hz⟩
+    specialize h1 z 
+    contradiction
+  · intro h1 z
+    by_contra hzn 
+    apply h1
+    use z
+    intro hz 
+    apply h1 
+    exact ⟨z, hzn⟩
+
+

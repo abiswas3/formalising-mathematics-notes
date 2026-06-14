@@ -35,22 +35,59 @@ variable (X : Type)
   (x y z : X)
 
 -- x,y,z are elements of `X` or, more precisely, terms of type `X`
-example : A ∪ A = A := by sorry
+example : A ∪ A = A := by 
+  ext x 
+  constructor
+  · intro h 
+    rw [Set.union_self A] at h 
+    exact h 
+  · intro h 
+    simp only [A.union_self] 
+    exact h
 
-example : A ∩ A = A := by sorry
+example : A ∩ A = A := by 
+  ext 
+  simp only [Set.inter_self]
 
-example : A ∩ ∅ = ∅ := by sorry
+example : A ∩ ∅ = ∅ := by 
+  simp only [Set.inter_empty]
 
-example : A ∪ univ = univ := by sorry
+example : A ∪ univ = univ := by  
+  simp only [Set.union_univ]
 
-example : A ⊆ B → B ⊆ A → A = B := by sorry
+example : A ⊆ B → B ⊆ A → A = B := by 
+  intro ab ba 
+  ext x 
+  constructor
+  · intro hx  
+    specialize ab hx
+    exact ab
+  · intro hx 
+    apply  ba at hx 
+    exact hx 
 
-example : A ∩ B = B ∩ A := by sorry
+example : A ∩ B = B ∩ A := by
+  ext x 
+  constructor
+  · intro hz
+    change (x ∈ A ∧ x ∈ B) at hz 
+    constructor
+    · exact hz.right 
+    · exact hz.left
+  · intro hz 
+    change (x ∈ B ∧ x ∈ A) at hz 
+    constructor
+    · exact hz.right 
+    · exact hz.left 
 
-example : A ∩ (B ∩ C) = A ∩ B ∩ C := by sorry
+example : A ∩ (B ∩ C) = A ∩ B ∩ C := by 
+  exact?
 
-example : A ∪ (B ∪ C) = A ∪ B ∪ C := by sorry
+example : A ∪ (B ∪ C) = A ∪ B ∪ C := by 
+exact?
 
-example : A ∪ B ∩ C = (A ∪ B) ∩ (A ∪ C) := by sorry
+example : A ∪ B ∩ C = (A ∪ B) ∩ (A ∪ C) := by 
+  exact?
 
-example : A ∩ (B ∪ C) = A ∩ B ∪ A ∩ C := by sorry
+example : A ∩ (B ∪ C) = A ∩ B ∪ A ∩ C := by 
+  exact inter_union_distrib_left A B C

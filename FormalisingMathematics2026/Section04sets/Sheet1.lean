@@ -63,7 +63,7 @@ theorem subset_def : A ⊆ B ↔ ∀ x, x ∈ A → x ∈ B := by
 variable (x : X)
 
 theorem mem_union_iff : x ∈ A ∪ B ↔ x ∈ A ∨ x ∈ B := by
-  rfl
+  exact Iff.rfl
 
 theorem mem_inter_iff : x ∈ A ∩ B ↔ x ∈ A ∧ x ∈ B :=
   -- you don't even have to go into tactic mode to prove this stuff
@@ -80,18 +80,52 @@ Let's prove some theorems.
 
 -/
 
-example : A ⊆ A := by sorry
+example : A ⊆ A := by rfl
 
-example : A ⊆ B → B ⊆ C → A ⊆ C := by sorry
+example : A ⊆ B → B ⊆ C → A ⊆ C := by 
+  intro h1 h2 z hz
+  have hb : z ∈ B := by exact h1 hz 
+  have hc: z ∈ C := by exact h2 hb
+  exact hc
 
-example : A ⊆ A ∪ B := by sorry
+example : A ⊆ A ∪ B := by 
+  intro z h
+  constructor
+  exact h 
 
-example : A ∩ B ⊆ A := by sorry
+example : A ∩ B ⊆ A := by
+    intro z h 
+    rcases h with ⟨left, right⟩
+    exact left
 
-example : A ⊆ B → A ⊆ C → A ⊆ B ∩ C := by sorry
+example : A ⊆ B → A ⊆ C → A ⊆ B ∩ C := by 
+  intro h1 h2 z h3
+  have h4: z ∈ B := by exact h1 h3 
+  apply h2 at h3
+  constructor <;> assumption
 
-example : B ⊆ A → C ⊆ A → B ∪ C ⊆ A := by sorry
+example : B ⊆ A → C ⊆ A → B ∪ C ⊆ A := by 
+  intro h1 h2 z h3 
+  rcases h3 with left | right
+  · apply h1 left  
+  · apply h2 right
 
-example : A ⊆ B → C ⊆ D → A ∪ C ⊆ B ∪ D := by sorry
 
-example : A ⊆ B → C ⊆ D → A ∩ C ⊆ B ∩ D := by sorry
+example : A ⊆ B → C ⊆ D → A ∪ C ⊆ B ∪ D := by 
+  intro h1 h2 z h3
+  rcases h3 with h | h 
+  · specialize h1 h
+    left 
+    assumption
+  · specialize h2 h
+    right
+    assumption
+
+example : A ⊆ B → C ⊆ D → A ∩ C ⊆ B ∩ D := by 
+  intro h1 h2 z h3
+  constructor
+  · specialize h1 h3.1
+    assumption
+  · specialize h2 h3.2
+    assumption
+

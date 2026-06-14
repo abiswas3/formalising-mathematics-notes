@@ -38,25 +38,73 @@ for group theory. In Lean we use the notation `f ⁻¹' T` for this pullback.
 
 variable (X Y : Type) (f : X → Y) (S : Set X) (T : Set Y)
 
-example : S ⊆ f ⁻¹' (f '' S) := by sorry
+example : S ⊆ f ⁻¹' (f '' S) := by
+  -- `A ⊆ B` unfolds to: ∀ x, x ∈ A → x ∈ B.
+  -- `intro x h` takes an arbitrary x and a proof h : x ∈ S.
+  intro a h
+  -- Goal: x ∈ f ⁻¹' (f '' S).
+  -- Membership in a PREIMAGE: `x ∈ f ⁻¹' B ↔ f x ∈ B`. Rewrite turns the goal
+  -- into a statement about `f x` instead of `x`.
+  rw [Set.mem_preimage]
+  -- Goal: f x ∈ f '' S.
+  -- Membership in an IMAGE: `y ∈ f '' S ↔ ∃ a, a ∈ S ∧ f a = y`. Rewrite exposes
+  -- the existential we must build.
+  rw [Set.mem_image]
+  -- Goal: ∃ a, a ∈ S ∧ f a = f x.
+  -- leaves the two conjuncts as separate goals `?_`.
+  use a 
 
-example : f '' (f ⁻¹' T) ⊆ T := by sorry
+example : f '' (f ⁻¹' T) ⊆ T := by 
+  intro a h 
+  rw [Set.mem_image] at h 
+  rcases h with ⟨b, hb⟩
+  rw [Set.mem_preimage] at hb
+  rw [<- hb.right] 
+  exact hb.left 
+
+
 
 -- `exact?` will do this but see if you can do it yourself.
-example : f '' S ⊆ T ↔ S ⊆ f ⁻¹' T := by sorry
+example : f '' S ⊆ T ↔ S ⊆ f ⁻¹' T := by 
+  simp?
 
 -- Pushforward and pullback along the identity map don't change anything
 -- pullback is not so hard
-example : id ⁻¹' S = S := by sorry
+example : id ⁻¹' S = S := by 
+  simp?
 
 -- pushforward is a little trickier. You might have to `ext x`, `constructor`.
-example : id '' S = S := by sorry
+example : id '' S = S := by 
+  simp?
 
 -- Now let's try composition.
 variable (Z : Type) (g : Y → Z) (U : Set Z)
 
 -- preimage of preimage is preimage of comp
-example : g ∘ f ⁻¹' U = f ⁻¹' (g ⁻¹' U) := by sorry
+example : g ∘ f ⁻¹' U = f ⁻¹' (g ⁻¹' U) := by 
+  rfl 
 
 -- preimage of preimage is preimage of comp
-example : g ∘ f '' S = g '' (f '' S) := by sorry
+example : g ∘ f '' S = g '' (f '' S) := by 
+ ext z 
+ constructor
+ · intro ha 
+   rcases ha with ⟨x, hx⟩
+   use f x 
+   constructor
+   · use x 
+     constructor
+     · exact hx.left 
+     · rfl 
+   · exact hx.right 
+ · intro ha 
+   rcases ha with ⟨y, hy, hg⟩
+   rw [Set.image]
+   rcases hy with ⟨x, hx⟩
+   use x
+   change ( x ∈ S ∧ g (f x) = z) 
+   rw [hx.right]
+   constructor
+   · exact hx.left 
+   · assumption
+

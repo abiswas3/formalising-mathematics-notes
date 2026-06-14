@@ -378,14 +378,15 @@ example : c * b * a = b * (a * c) := by
   ring
 
 example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b := by
-  sorry
+  ring 
 
 example : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by
-  sorry
+  ring 
 
 example (hyp : c = d * a + b) (hyp' : b = a * d) : c = 2 * a * d := by
-  sorry
-
+  rw [mul_assoc _ _ _ , <- hyp']
+  rw [hyp, hyp']
+  ring 
 end
 
 -- The nth_rw tactic allows you to be more precise about which occurrence of a subterm you want to
