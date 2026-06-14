@@ -79,23 +79,57 @@ Using these axioms, see if you can develop the basic theory of lattices.
 -/
 
 -- let L be a lattice, and let a,b,c be elements of L
+
+-- Partial order info, every latice is also a partial order
+/- `le_refl a : a ≤ a` -/
+/- `le_antisymm : a ≤ b → b ≤ a → a = b` -/
+/- `le_trans : a ≤ b → b ≤ c → a ≤ c` 
+
+`le_sup_left : a ≤ a ⊔ b` :
+`le_sup_right : b ≤ a ⊔ b`
+`sup_le : a ≤ c → b ≤ c → a ⊔ b ≤ c` -- this says it's the least upper bound.
+-/
+
 variable (L : Type) [Lattice L] (a b c : L)
 
 example : a ⊔ b = b ⊔ a := by
   -- you might want to start with `apply le_antisymm` (every lattice is a partial order so this is
   -- OK)
-  -- You'll then have two goals so use `\.` and indent two spaces.
-  sorry
+  -- You'll then have two goals so use  and indent two spaces.
+  apply le_antisymm
+  · apply sup_le 
+    · exact le_sup_right
+    · exact le_sup_left 
+  · apply sup_le
+    · exact le_sup_right
+    · exact le_sup_left  
 
 example : a ⊔ b ⊔ c = a ⊔ (b ⊔ c) := by
-  sorry
+  apply le_antisymm
+  · apply sup_le 
+    · apply sup_le 
+      · exact le_sup_left 
+      · apply @le_trans _ _ _ (b ⊔ c) _ 
+        · exact (le_sup_left : b ≤ b ⊔ c)
+          -- exact @le_sup_left _ _ b c -- (also works, @ cos these are implicity:)
+        · exact le_sup_right 
+    · apply @le_trans _ _ c (b ⊔ c) _
+      · exact le_sup_right
+      · exact le_sup_right 
+  · apply sup_le 
+    · apply le_trans (le_sup_left : a ≤ a ⊔ b) le_sup_left
+    · apply sup_le
+      · apply le_trans (le_sup_right : b ≤ a ⊔ b) le_sup_left
+      · exact le_sup_right
 
 -- could golf this entire proof into one (long) line
 -- `a ⊓ _` preserves `≤`.
 -- Note: this is called `inf_le_inf_left a h` in mathlib; see if you can prove it
 -- directly without using this.
 example (h : b ≤ c) : a ⊓ b ≤ a ⊓ c := by
-  sorry
+  apply le_inf 
+  · exact?
+  · exact?
 
 /-
 
