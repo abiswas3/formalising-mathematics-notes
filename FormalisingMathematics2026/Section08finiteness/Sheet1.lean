@@ -37,12 +37,12 @@ is one way of saying "let `S` be a finite subset of `X`":
 -/
 
 -- Let X be a type, let `S` be a subset of `X`, and assume `S` is finite. Then S=S.
-example (X : Type) (S : Set X) (hS : Set.Finite S) : S = S := by
+example (X : Type) (S : Set X) (_ : Set.Finite S) : S = S := by
   rfl
 
 -- Note that because `S` has type `Set (something)` we can use dot notation here:
 -- this means the same thing as the above example.
-example (X : Type) (S : Set X) (hS : S.Finite) : S = S := by
+example (X : Type) (S : Set X) (_ : S.Finite) : S = S := by
   rfl
 
 -- Lots of proofs about finite sets in this sense live in the `Set.Finite` namespace.
@@ -75,7 +75,7 @@ displayed as `↑S` in Lean, with this arrow meaning "the obvious map from `Fins
 variable (X : Type)
 
 -- If S is a Finset, then S (considered as a set) is equal to itself.
-example (S : Finset X) : (S : Set X) = (S : Set X) := by
+example (S : Finset X) : ↑S = (S : Set X) := by
   -- goal is `⊢ ↑S = ↑S`
   rfl
 
